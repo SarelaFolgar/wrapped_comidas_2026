@@ -84,6 +84,8 @@ function cargarDatos() {
 
 // === Pantalla de carga ===
 function mostrarPantallaCarga() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     contenido.innerHTML = `
         <div class="loading">
             <div class="loading-spinner"></div>
@@ -95,6 +97,8 @@ function mostrarPantallaCarga() {
 
 // === Pantalla de error ===
 function mostrarError() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     contenido.innerHTML = `
         <div class="error">
             <h2>😢 Ups, algo salió mal</h2>
@@ -124,6 +128,8 @@ function iniciarApp(datos) {
 
 // === Pantalla de selección de usuario ===
 function mostrarPantallaSeleccion(usuarios) {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(0);
@@ -176,6 +182,7 @@ function manejarClicPantalla(e) {
     if (!window.usuarioSeleccionado) return;
     
     limpiarTimeouts();
+    contenido.scrollTop = 0;
     window.pantallaActual++;
     
     // Navegar a la pantalla correspondiente
@@ -188,6 +195,7 @@ function manejarClicPantalla(e) {
         case 6: mostrarPantalla6(); break;
         case 7: mostrarPantalla7(); break;
         case 8: mostrarPantalla8(); break;
+        case 9: mostrarPantalla9(); break;
         default: 
             window.pantallaActual = 0;
             const usuarios = [...new Set(window.datosComidas.map(item => item.usuario))];
@@ -198,6 +206,8 @@ function manejarClicPantalla(e) {
 
 // === PANTALLA 1: Bienvenida ===
 function mostrarPantalla1() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(1);
@@ -214,7 +224,8 @@ function mostrarPantalla1() {
     mostrarElemento(`<p>Vamos a analizar tus hábitos alimenticios de 2026 🍴</p>`, delay);
     delay += 1500;
     
-    mostrarEmoji('📊', delay);
+    //mostrarEmoji('📊', delay);
+    mostrarImagen('imagenes/nerd.png', delay, 150);
     delay += 1000;
     
     mostrarElemento(`<p>¿Listo para descubrir cuánto has comido?</p>`, delay);
@@ -222,6 +233,8 @@ function mostrarPantalla1() {
 
 // === PANTALLA 2: Total de comidas ===
 function mostrarPantalla2() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(2);
@@ -287,6 +300,8 @@ function mostrarPantalla2() {
 
 // === PANTALLA 3: Primer y último plato del año ===
 function mostrarPantalla3() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(3);
@@ -408,6 +423,8 @@ function mostrarPantalla3() {
 
 // === PANTALLA 4: Día favorito para comer ===
 function mostrarPantalla4() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(3);
@@ -527,8 +544,10 @@ function mostrarPantalla4() {
         }
     }, delay);
 }
-// === PANTALLA 5: Plato más repetido ===
+// === PANTALLA 5: Top 5 platos más repetidos ===
 function mostrarPantalla5() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(4);
@@ -542,29 +561,32 @@ function mostrarPantalla5() {
         conteoPlatos[plato] = (conteoPlatos[plato] || 0) + 1;
     });
     
-    // Encontrar plato más repetido
-    let platoFavorito = '';
-    let vecesRepetido = 0;
+    // Convertir a array y ordenar por frecuencia (mayor a menor)
+    const platosOrdenados = Object.entries(conteoPlatos)
+        .sort((a, b) => b[1] - a[1]) // Ordenar descendente
+        .slice(0, 5); // Tomar solo top 5
     
-    Object.entries(conteoPlatos).forEach(([plato, conteo]) => {
-        if (conteo > vecesRepetido) {
-            vecesRepetido = conteo;
-            platoFavorito = plato;
-        }
-    });
+    // Plato más repetido (el primero)
+    const platoFavorito = platosOrdenados[0] ? platosOrdenados[0][0] : '';
+    const vecesRepetido = platosOrdenados[0] ? platosOrdenados[0][1] : 0;
+    
+    // Calcular porcentaje sobre total de platos
+    const totalPlatos = datosUsuario.length;
+    const porcentajeFavorito = totalPlatos > 0 ? Math.round((vecesRepetido / totalPlatos) * 100) : 0;
     
     let delay = 0;
     
-    mostrarElemento('<h2>⭐ Plato Favorito</h2>', delay);
+    mostrarElemento('<h2>⭐ Top 5 Platos</h2>', delay);
     delay += 1200;
     
-    mostrarElemento(`<p>Tu plato más repetido es:</p>`, delay);
+    // Mostrar plato favorito destacado
+    mostrarElemento(`<p>Tu <strong>#1</strong> del año:</p>`, delay);
     delay += 1500;
     
     mostrarElemento(`<p style="font-size: 2rem; font-weight: 700; color: #e74c3c;">${platoFavorito}</p>`, delay);
     delay += 1500;
     
-    mostrarElemento(`<p>Lo comiste <strong>${vecesRepetido} veces</strong> este año</p>`, delay);
+    mostrarElemento(`<p>Lo comiste <strong>${vecesRepetido} veces</strong> (${porcentajeFavorito}% de todos tus platos)</p>`, delay);
     delay += 1500;
     
     // Emoji según tipo de plato
@@ -575,10 +597,269 @@ function mostrarPantalla5() {
     else if (platoFavorito.toLowerCase().includes('ensalada')) emoji = '🥗';
     
     mostrarEmoji(emoji, delay);
+    delay += 1000;
+    
+    // Mostrar gráfico de barras con top 5
+    if (platosOrdenados.length > 0) {
+        setTimeout(() => {
+            const grafico = document.createElement('div');
+            grafico.className = 'fade';
+            grafico.style.marginTop = '20px';
+            grafico.style.width = '100%';
+            grafico.style.maxWidth = '450px';
+            
+            const maxVeces = Math.max(...platosOrdenados.map(item => item[1]));
+            
+            grafico.innerHTML = `
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 15px; backdrop-filter: blur(5px);">
+                    <p style="margin-bottom: 15px; font-weight: 600; color: #2c3e50; text-align: center;">🏆 Ranking Top 5</p>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        ${platosOrdenados.map(([plato, veces], index) => {
+                            const porcentaje = maxVeces > 0 ? (veces / maxVeces) * 100 : 0;
+                            const porcentajeTotal = totalPlatos > 0 ? Math.round((veces / totalPlatos) * 100) : 0;
+                            const esPrimero = index === 0;
+                            const color = esPrimero ? '#e74c3c' : '#3498db';
+                            
+                            // Emoji según posición
+                            let posicionEmoji = '';
+                            if (index === 0) posicionEmoji = '🥇';
+                            else if (index === 1) posicionEmoji = '🥈';
+                            else if (index === 2) posicionEmoji = '🥉';
+                            else posicionEmoji = '🔸';
+                            
+                            // Acortar nombres largos
+                            const platoCorto = plato.length > 20 ? plato.substring(0, 20) + '...' : plato;
+                            
+                            return `
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 40px; text-align: center; font-size: 1.2rem; font-weight: 700; color: ${color}">
+                                        ${posicionEmoji}
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span style="font-weight: ${esPrimero ? '700' : '600'}; color: ${color}">${platoCorto}</span>
+                                            <div style="display: flex; gap: 8px; align-items: center;">
+                                                <span style="font-weight: 700; color: ${color}">${veces}</span>
+                                                <span style="font-size: 0.8rem; color: #7f8c8d;">(${porcentajeTotal}%)</span>
+                                            </div>
+                                        </div>
+                                        <div style="height: 20px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; position: relative;">
+                                            <div style="width: ${porcentaje}%; height: 100%; background: ${color}; transition: width 1.5s ease;"></div>
+                                            <div style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 0.8rem; font-weight: 600; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                                                #${index + 1}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.8rem; color: #7f8c8d; text-align: center;">
+                        <p>Total de platos registrados: <strong>${totalPlatos}</strong></p>
+                    </div>
+                </div>
+            `;
+            
+            contenido.appendChild(grafico);
+            setTimeout(() => grafico.classList.add('show'), 50);
+            
+            // Estadística adicional si el #1 es muy dominante
+            if (platosOrdenados.length > 1) {
+                const segundo = platosOrdenados[1][1];
+                const diferencia = vecesRepetido - segundo;
+                
+                if (diferencia > 5) {
+                    setTimeout(() => {
+                        const nota = document.createElement('p');
+                        nota.className = 'fade';
+                        nota.style.fontSize = '0.9rem';
+                        nota.style.color = '#7f8c8d';
+                        nota.style.marginTop = '10px';
+                        nota.style.textAlign = 'center';
+                        nota.innerHTML = `<strong>${platoFavorito}</strong> le saca <strong>${diferencia}</strong> platos de ventaja al #2`;
+                        contenido.appendChild(nota);
+                        setTimeout(() => nota.classList.add('show'), 50);
+                    }, 500);
+                }
+            }
+        }, delay);
+    }
 }
 
-// === PANTALLA 6: Horario preferido ===
+// === PANTALLA 6: Resumen de contadores ===
 function mostrarPantalla6() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
+    limpiarTimeouts();
+    contenido.innerHTML = '';
+    contenido.scrollTop = 0; // Resetear scroll
+    
+    // Poner el número de pantalla que corresponda, ej: actualizarProgreso(4);
+    
+    const datosUsuario = window.datosUsuario;
+    
+    // Calcular sumas de contadores
+    const totalCafe = datosUsuario.reduce((sum, item) => sum + (item.contador_cafe || 0), 0);
+    const totalYogur = datosUsuario.reduce((sum, item) => sum + (item.contador_yogur || 0), 0);
+    const totalBurgerKing = datosUsuario.reduce((sum, item) => sum + (item.contador_burger_king || 0), 0);
+    
+    // Calcular porcentajes sobre el total de comidas
+    const totalComidas = datosUsuario.reduce((sum, item) => sum + (item.n_plato_dia || 0), 0);
+    const porcentajeCafe = totalComidas > 0 ? Math.round((totalCafe / totalComidas) * 100) : 0;
+    const porcentajeYogur = totalComidas > 0 ? Math.round((totalYogur / totalComidas) * 100) : 0;
+    const porcentajeBurgerKing = totalComidas > 0 ? Math.round((totalBurgerKing / totalComidas) * 100) : 0;
+    
+    let delay = 0;
+    
+    mostrarElemento('<h2>📊 Tus Favoritos</h2>', delay);
+    delay += 1200;
+    
+    mostrarElemento('<p>Veamos qué te gusta más...</p>', delay);
+    delay += 1500;
+    
+    // CAFÉ
+    if (totalCafe > 0) {
+        mostrarElemento(`<p><strong>☕ Café:</strong> ${totalCafe} veces</p>`, delay);
+        delay += 1200;
+        
+        mostrarElemento(`<p>El ${porcentajeCafe}% de tus comidas incluyeron café</p>`, delay);
+        delay += 1500;
+        
+        // Comentario según cantidad de café
+        let comentarioCafe = '';
+        if (totalCafe > 50) {
+            comentarioCafe = '¡Eres un auténtico cafeinómano! ⚡';
+        } else if (totalCafe > 20) {
+            comentarioCafe = 'Te gusta arrancar el día con energía ☀️';
+        } else if (totalCafe > 0) {
+            comentarioCafe = 'Un cafelito de vez en cuando no hace daño 😌';
+        }
+        
+        if (comentarioCafe) {
+            mostrarElemento(`<p>${comentarioCafe}</p>`, delay);
+            delay += 1500;
+        }
+    }
+    
+    // YOGUR
+    if (totalYogur > 0) {
+        // Separador visual
+        mostrarElemento('<div style="height: 1px; background: rgba(0,0,0,0.1); margin: 15px 0;"></div>', delay);
+        delay += 500;
+        
+        mostrarElemento(`<p><strong>🥛 Yogur:</strong> ${totalYogur} veces</p>`, delay);
+        delay += 1200;
+        
+        mostrarElemento(`<p>El ${porcentajeYogur}% de tus comidas incluyeron yogur</p>`, delay);
+        delay += 1500;
+        
+        // Comentario según cantidad de yogur
+        let comentarioYogur = '';
+        if (totalYogur > 30) {
+            comentarioYogur = '¡Tu flora intestinal te adora! 🦠💖';
+        } else if (totalYogur > 10) {
+            comentarioYogur = 'Muy saludable, sigue así 🍃';
+        } else if (totalYogur > 0) {
+            comentarioYogur = 'Un toque de calcio en tu dieta 💪';
+        }
+        
+        if (comentarioYogur) {
+            mostrarElemento(`<p>${comentarioYogur}</p>`, delay);
+            delay += 1500;
+        }
+    }
+    
+    // BURGER KING
+    if (totalBurgerKing > 0) {
+        // Separador visual
+        mostrarElemento('<div style="height: 1px; background: rgba(0,0,0,0.1); margin: 15px 0;"></div>', delay);
+        delay += 500;
+        
+        mostrarElemento(`<p><strong>🍔 Burger King:</strong> ${totalBurgerKing} veces</p>`, delay);
+        delay += 1200;
+        
+        mostrarElemento(`<p>El ${porcentajeBurgerKing}% de tus comidas fueron en BK</p>`, delay);
+        delay += 1500;
+        
+        // Comentario según cantidad de BK
+        let comentarioBK = '';
+        if (totalBurgerKing > 20) {
+            comentarioBK = '¡Deberían darte acciones de la empresa! 👑';
+        } else if (totalBurgerKing > 10) {
+            comentarioBK = 'Eres cliente VIP sin saberlo 😎';
+        } else if (totalBurgerKing > 0) {
+            comentarioBK = 'Un Whopper de vez en cuando no hace daño 🍔';
+        }
+        
+        if (comentarioBK) {
+            mostrarElemento(`<p>${comentarioBK}</p>`, delay);
+            delay += 1500;
+        }
+    }
+    
+    // Si no hay contadores
+    if (totalCafe === 0 && totalYogur === 0 && totalBurgerKing === 0) {
+        mostrarElemento('<p>No registraste ninguno de tus favoritos este año</p>', delay);
+        delay += 1500;
+        mostrarElemento('<p>¡El próximo año apunta más cosas! 📝</p>', delay);
+        delay += 1500;
+    }
+    
+    // Gráfico de barras para comparar
+    if (totalCafe > 0 || totalYogur > 0 || totalBurgerKing > 0) {
+        setTimeout(() => {
+            const grafico = document.createElement('div');
+            grafico.className = 'fade';
+            grafico.style.marginTop = '20px';
+            grafico.style.width = '100%';
+            grafico.style.maxWidth = '400px';
+            
+            const contadores = [
+                { nombre: 'Café', valor: totalCafe, color: '#8B4513', emoji: '☕' },
+                { nombre: 'Yogur', valor: totalYogur, color: '#F0E68C', emoji: '🥛' },
+                { nombre: 'Burger King', valor: totalBurgerKing, color: '#FF4500', emoji: '🍔' }
+            ].filter(item => item.valor > 0);
+            
+            const maxValor = Math.max(...contadores.map(item => item.valor));
+            
+            grafico.innerHTML = `
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 15px; backdrop-filter: blur(5px);">
+                    <p style="margin-bottom: 15px; font-weight: 600; color: #2c3e50; text-align: center;">📈 Comparativa</p>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        ${contadores.map(item => {
+                            const porcentaje = maxValor > 0 ? (item.valor / maxValor) * 100 : 0;
+                            return `
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 1.8rem;">${item.emoji}</div>
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span style="font-weight: 600;">${item.nombre}</span>
+                                            <span style="font-weight: 700; color: ${item.color};">${item.valor}</span>
+                                        </div>
+                                        <div style="height: 20px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden;">
+                                            <div style="width: ${porcentaje}%; height: 100%; background: ${item.color}; transition: width 1s ease;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            
+            contenido.appendChild(grafico);
+            setTimeout(() => grafico.classList.add('show'), 50);
+        }, delay);
+    }
+    
+    delay += 1500;
+    mostrarEmoji('🏆', delay);
+}
+
+// === PANTALLA 7: Horario preferido ===
+function mostrarPantalla7() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(5);
@@ -709,8 +990,10 @@ function mostrarPantalla6() {
     }
 }
 
-// === PANTALLA 7: Mes más activo ===
-function mostrarPantalla7() {
+// === PANTALLA 8: Mes más activo ===
+function mostrarPantalla8() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(6);
@@ -856,8 +1139,10 @@ function mostrarPantalla7() {
     }
 }
 
-// === PANTALLA 8: Despedida ===
-function mostrarPantalla8() {
+// === PANTALLA 9: Despedida ===
+function mostrarPantalla9() {
+    // Añadir esta línea al inicio de cada función
+    contenido.scrollTop = 0;
     limpiarTimeouts();
     contenido.innerHTML = '';
     actualizarProgreso(7);
