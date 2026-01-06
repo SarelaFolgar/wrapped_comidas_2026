@@ -23,10 +23,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     padding: 20px;
     position: relative;
     z-index: 1;
+    /* Cambiado: quitado justify-content: center */
 }
 
 #contenido {
@@ -34,11 +34,18 @@ body {
     max-width: 500px;
     text-align: center;
     padding: 20px;
-    flex-grow: 1;
+    /* CAMBIO PRINCIPAL: Añadido scroll vertical */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    /* Altura máxima para que el scroll funcione */
+    max-height: calc(100vh - 160px); /* Resta espacio para progreso e instrucción */
+    /* Ajustado: quitado justify-content y align-items center */
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    /* Padding interno para que el contenido no toque los bordes al hacer scroll */
+    padding-top: 10px;
+    padding-bottom: 30px;
 }
 
 /* Títulos y texto */
@@ -114,8 +121,10 @@ strong {
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin: 20px 0;
+    margin: 15px 0;
     padding: 10px;
+    /* Asegurar que siempre esté visible */
+    flex-shrink: 0;
 }
 
 .punto {
@@ -138,9 +147,12 @@ strong {
     align-items: center;
     color: #7f8c8d;
     font-size: 0.9rem;
-    margin-top: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
     opacity: 0.8;
     animation: pulse 2s infinite;
+    /* Asegurar que siempre esté visible */
+    flex-shrink: 0;
 }
 
 #instruccion i {
@@ -222,9 +234,9 @@ strong {
 img {
     max-width: 100%;
     height: auto;
-    border-radius: 15px;
+    border-radius: none;
     margin: 20px 0;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: none;
 }
 
 /* Animaciones */
@@ -243,18 +255,43 @@ img {
     to { opacity: 1; transform: scale(1); }
 }
 
+/* Estilos para scrollbar (opcional, para que se vea mejor) */
+#contenido::-webkit-scrollbar {
+    width: 6px;
+}
+
+#contenido::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+#contenido::-webkit-scrollbar-thumb {
+    background: rgba(231, 76, 60, 0.5);
+    border-radius: 10px;
+}
+
+#contenido::-webkit-scrollbar-thumb:hover {
+    background: rgba(231, 76, 60, 0.7);
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     h1 { font-size: 2.2rem; }
     h2 { font-size: 1.8rem; }
     p { font-size: 1.2rem; }
     .boton-usuario { font-size: 1.3rem; padding: 18px 25px; }
-    #contenido { padding: 15px; }
+    #contenido { 
+        padding: 15px;
+        max-height: calc(100vh - 140px); /* Ajustado para móvil */
+    }
 }
 
 @media (max-height: 700px) {
     h1 { font-size: 2rem; margin-bottom: 15px; }
     .emoji-grande { font-size: 3rem; margin: 15px 0; }
+    #contenido {
+        max-height: calc(100vh - 130px); /* Ajustado para pantallas más cortas */
+    }
 }
 
 /* Loading */
@@ -265,6 +302,9 @@ img {
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    /* Asegurar que el loading esté centrado verticalmente */
+    justify-content: center;
+    min-height: 200px;
 }
 
 .loading-spinner {
